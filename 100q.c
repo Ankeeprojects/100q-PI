@@ -383,38 +383,25 @@ int take (int n, LInt *l){
 
 // QUESTAO 20
 int drop (int n, LInt *l){
-    LInt aux = *l, ant = NULL;
-    int length = 0, res;
+    LInt aux, ant;
+    int conta = 0, res;
 
-    while (aux != NULL) {
-        length++;
-        aux = aux->prox;
-    }
+    for (aux = *l; aux != NULL; aux = aux->prox) conta++;
 
-    aux = *l;
-
-    if (n > length)
-        res = length;
+    if (n > conta)
+        res = conta;
     else res = n;
 
-    while (*l != NULL && n != 0) {
-        ant = *l;
-        *l = (*l)->prox;
-        free(ant);
-        n--;
-    }
+    for (;n > 0 && *l != NULL; n--,ant = *l, *l=(*l)->prox, free(ant)) ;
+
     return res;
 }
 
 // QUESTAO 21
 LInt NForward (LInt l, int N){
-    LInt aux = l;
+    for (; N > 0; l = l->prox, N--);
 
-    while (N >1) {
-        aux = aux->prox;
-        N--;
-    }
-    return aux->prox;
+    return l;
 }
 
 // QUESTAO 22
@@ -429,64 +416,48 @@ int listToArray (LInt l, int v[], int N){
 
 // QUESTAO 23
 LInt arrayToList (int v[], int N){
-    LInt nova = NULL,aux;
+    LInt nova = NULL, aux = NULL;
     int i;
 
-    for (i = 0; N>0; N--, i++) {
-        if (nova == NULL) {
-            nova = newLInt(v[i],NULL);
-            aux = nova;
-        } else {
-            aux->prox = newLInt(v[i],NULL);
-            aux = aux->prox;
-        }
-    }
+    for (i = 0; i < N; i++)
+        if (aux == NULL)
+            aux = nova = newLInt(v[i],NULL);
+        else
+            aux = aux -> prox = newLInt(v[i], NULL);
 
     return nova;
 }
 
 // QUESTAO 24
 LInt somasAcL (LInt l) {
-    int i, conta = 0;
-    LInt nova = NULL, aux=l, somatorio, aux2;
+    LInt nova = NULL, inicio, aux, auxnova = NULL;
 
-    for (i = 0; aux!=NULL; i++, aux=aux->prox) {
-        if(nova == NULL) {
-            nova = newLInt(l->valor,NULL);
-            somatorio = nova;
-        } else {
-            somatorio->prox = newLInt(0,NULL);
-            somatorio = somatorio->prox;
-            aux2 = l;
-            conta = 0;
+    for (inicio = l; inicio != NULL; inicio = inicio->prox) {
+        if (auxnova == NULL)
+            auxnova = nova = newLInt(0, NULL);
+        else auxnova = auxnova->prox = newLInt(0, NULL);
 
-            while(conta <= i) {
-                conta++;
-                somatorio->valor+=aux2->valor;
-                aux2=aux2->prox;
-            }
-        }
+        for (aux = l; aux != inicio->prox; aux = aux->prox)
+            auxnova->valor += aux ->valor;
     }
     return nova;
 }
 
 // QUESTAO 25
 void remreps (LInt l){
-    LInt aux, ant = l,libertador;
+    LInt inicio, aux, ant, liberta;
 
-    if(l!= NULL && l->prox!=NULL) {
-
-        for(aux = l->prox; aux!= NULL; aux=aux->prox) {
-            if(ant->valor != aux ->valor) {
-                ant->prox = aux;
-                ant = aux;
+    for (inicio = l; inicio != NULL; inicio = inicio->prox)
+        for (aux = inicio->prox, ant = inicio ; aux != NULL;)
+            if (inicio -> valor == aux->valor) {
+                ant ->prox = aux->prox;
+                liberta = aux;
+                aux = aux->prox;
+                free(liberta);
             } else {
-                libertador = aux;
-                ant ->prox = NULL;
-                free(libertador);
+                ant = aux;
+                aux = aux->prox;
             }
-        }
-    }
 }
 
 // QUESTAO 26
@@ -510,31 +481,24 @@ LInt rotateL (LInt l){
 
 // QUESTAO 27
 LInt parte (LInt l){
-    LInt ant = NULL, aux = l, nova = NULL, aux2;
-    int i;
+    LInt nova = NULL, ant = l, aux = l, auxnova = NULL;
+    int conta = 1;
 
-    for (i = 1; aux != NULL; i++) {
-        if (i % 2 == 1) {
-            if (ant == NULL)
-                ant = aux;
-            else {
-                ant -> prox = aux;
-                ant = ant->prox;
+    while (aux != NULL) {
+        if (conta % 2 == 1) {
+            ant = aux;
+            aux = aux->prox;
+            ant->prox = NULL;
+        } else {
+            ant ->prox = aux->prox;
+            if(auxnova == NULL) {
+                auxnova = nova = newLInt(aux->valor, NULL);
+            } else {
+                auxnova = auxnova->prox = newLInt (aux -> valor, NULL);
             }
             aux = aux->prox;
-            ant -> prox = NULL;
-        } else {
-            if (nova == NULL) {
-                nova = aux;
-                aux = aux->prox;
-                aux2 = nova;
-            } else {
-                aux2 -> prox = aux;
-                aux2 = aux2->prox;
-                aux = aux->prox;
-            }
-            aux2 -> prox = NULL;
         }
+        conta++;
     }
     return nova;
 }
