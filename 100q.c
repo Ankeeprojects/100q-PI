@@ -35,10 +35,8 @@ void freeL (LInt l) {
 
 // QUESTAO 3
 void imprimeL (LInt l) {
-    while (l != NULL) {
-        printf("O valor desta célula é: %d\n", l->valor)
-        l = l->prox;
-    }
+    for (;l != NULL; l = l->prox)
+        printf("O valor desta célula é: %d\n", l->valor;
 }
 
 // QUESTAO 4
@@ -56,12 +54,10 @@ LInt reverseL (LInt l){
 
 // QUESTAO 5
 void insertOrd (LInt *l, int x){
-    LInt ant = NULL, novo = newLInt(x,NULL), l1 = *l;
+    LInt ant = NULL, novo = newLInt(x,NULL), l1;
 
-    while (l1 != NULL && l1->valor <= x) {
+    for (l1 = *l; l1 != NULL && l1->valor <= x; l1 = l1->prox)
         ant = l1;
-        l1 = l1->prox;
-    }
 
     if (ant == NULL) {
         novo -> prox = *l;
@@ -74,13 +70,11 @@ void insertOrd (LInt *l, int x){
 
 // QUESTAO 6
 int removeOneOrd (LInt *l, int x){
-    LInt aux = *l, ant = NULL;
+    LInt aux, ant = NULL;
     int sucesso = 0;
 
-    while (aux != NULL && aux -> valor != x) {
+    for (aux = *l; aux != NULL && aux -> valor != x; aux = aux->prox)
         ant = aux;
-        aux = aux->prox;
-    }
 
     if (aux != NULL) {
         if (ant == NULL)
@@ -97,11 +91,11 @@ int removeOneOrd (LInt *l, int x){
 void merge (LInt *r, LInt l1, LInt l2){
     LInt re;
 
-    if (l1 == NULL) {
+    if (l1 == NULL)
         *r = l2;
-    } else if (l2 == NULL) {
+    else if (l2 == NULL)
         *r == l1;
-    } else {
+    else {
         if (l1 -> valor > l2 -> valor) {
             re = *r = l2;
             l2 = l2->prox;
@@ -110,7 +104,7 @@ void merge (LInt *r, LInt l1, LInt l2){
             l1 = l1->prox;
         }
 
-        while (l1 != NULL && l2 != NULL) {
+        for(;l1 != NULL && l2 != NULL; re = re->prox)
             if (l1 -> valor > l2->valor) {
                 re -> prox = l2;
                 l2 = l2->prox;
@@ -118,8 +112,6 @@ void merge (LInt *r, LInt l1, LInt l2){
                 re -> prox = l1;
                 l1 = l1->prox;
             }
-            re = re->prox;
-        }
 
         if (l1 == NULL)
             re->prox = l2;
@@ -159,98 +151,67 @@ void splitQS (LInt l, int x, LInt *mx, LInt *Mx){
 
 // QUESTAO 9
 LInt parteAmeio (LInt *l){
-    LInt aux, y = NULL, res = NULL;
+    LInt aux, nova = NULL, res = NULL;
     int length = 0;
 
-    for (aux = *l; aux != NULL; aux = aux->prox)
-        length++;
+    for (aux = *l; aux != NULL; length++, aux = aux->prox);
 
-    length = length/2;
-
-    while (length > 0) {
-        if (y == NULL) {
-            y = *l;
+    for (length = length/2; length > 0; nova->prox = NULL, length--)
+        if (nova == NULL) {
+            nova = *l;
             *l = (*l)->prox;
-            y -> prox = NULL;
-            res = y;
+            res = nova;
         } else {
-            y -> prox = *l;
+            nova -> prox = *l;
             *l = (*l)->prox;
-            y = y->prox;
+            nova = nova->prox;
         }
-        y->prox = NULL;
-        length--;
-    }
+
     return res;
 }
 
 // QUESTAO 10
 int removeAll (LInt *l, int x){
-    LInt ant = NULL;
-    LInt aux = *l;
     int conta = 0;
+    LInt aux, ant = NULL;
 
-    while (aux != NULL) {
+    for(aux = *l; aux != NULL; aux = aux->prox)
         if (aux -> valor == x) {
-            if (ant == NULL) {
-                *l = (*l)->prox;
-                aux = *l;
-            } else {
-                ant -> prox = aux -> prox;
-                aux = aux -> prox;
-            }
+            if (ant == NULL)
+                *l = aux->prox;
+            else
+                ant -> prox = aux->prox;
             conta++;
-        } else {
-            ant = aux;
-            aux = aux->prox;
-        }
-    }
+        } else ant = aux;
+
     return conta;
 }
 
 // QUESTAO 11
 int removeDups (LInt *l){
-    LInt inicio = *l;
-    LInt ant = inicio, aux = NULL;
+    LInt inicio, aux, ant;
     int conta = 0;
 
-    if ((*l) -> prox != NULL) {
-        aux = (*l)->prox;
-        while (inicio != NULL) {
-            aux = inicio->prox;
-            ant = inicio;
-            while (aux != NULL) {
-                if (inicio -> valor == aux -> valor) {
-                    ant -> prox = aux -> prox;
-                    conta++;
-                } else {
-                    ant = aux;
-                }
-                aux = aux->prox;
-            }
-            inicio = inicio->prox;
-        }
-    }
+    for (inicio = *l; inicio != NULL; inicio = inicio->prox)
+        for (aux = inicio->prox, ant = inicio; aux != NULL; aux = aux->prox)
+            if (inicio->valor == aux->valor) {
+                ant -> prox = aux->prox;
+                conta++;
+            } else ant = aux;
+
     return conta;
 }
 
 // QUESTAO 12
 int removeMaiorL (LInt *l){
-    LInt aux = *l, ant = NULL;
+    LInt aux, ant = NULL;
     int maior = aux-> valor;
 
-    while (aux != NULL) {
+    for (aux = *l; aux != NULL; aux = aux->prox)
         if (aux -> valor > maior)
             maior = aux->valor;
 
-        aux = aux->prox;
-    }
-
-    aux = *l;
-    while (aux -> valor != maior) {
-        ant = aux;
-        aux = aux->prox;
-    }
+    for (aux = *l; aux -> valor != maior; ant = aux, aux = aux->prox);
 
     if (ant == NULL)
         *l = (*l)->prox;
@@ -261,12 +222,9 @@ int removeMaiorL (LInt *l){
 
 // QUESTAO 13
 void init (LInt *l){
-    LInt aux = *l, ant = NULL;
+    LInt aux, ant;
 
-    while ( aux -> prox != NULL) {
-        ant = aux;
-        aux = aux -> prox;
-    }
+    for (aux = *l, ant = NULL; aux -> prox != NULL; ant = aux, aux = aux->prox);
 
     if (ant != NULL) {
         ant -> prox = aux -> prox;
@@ -279,12 +237,9 @@ void init (LInt *l){
 
 // QUESTAO 14
 void appendL (LInt *l, int x) {
-    LInt aux = *l, ant = NULL, novo = newLInt(x, NULL);
+    LInt aux, ant, novo = newLInt(x, NULL);
 
-    while (aux != NULL) {
-        ant = aux;
-        aux = aux->prox;
-    }
+    for (aux = *l, ant = NULL; aux != NULL; ant = aux, aux = aux->prox);
 
     if (ant == NULL)
         *l = novo;
@@ -299,8 +254,7 @@ void concatL (LInt *a, LInt b){
     if (*a == NULL)
         *a = b;
     else {
-        while (aux -> prox != NULL)
-            aux = aux->prox;
+        for (; aux -> prox != NULL; aux = aux->prox);
 
         aux -> prox = b;
     }
@@ -308,67 +262,54 @@ void concatL (LInt *a, LInt b){
 
 // QUESTAO 16
 LInt cloneL (LInt l) {
-    LInt nova = NULL, aux;
+    LInt nova, aux;
 
-    while (l != NULL) {
-        if (nova == NULL) {
-            nova = newLInt(l->valor, NULL);
-            aux = nova;
-        } else {
-            aux->prox = newLInt(l->valor, NULL);
-            aux = aux -> prox;
-        }
-    }
+    for (nova = NULL;l != NULL; l=l->prox)
+        if (nova == NULL)
+            aux = nova = newLInt(l->valor, NULL);
+        else
+            aux = aux->prox = newLInt(l->valor, NULL);
+
     return nova;
 }
 
 // QUESTAO 17
 LInt cloneRev (LInt l){
-    LInt nova = NULL, ant;
+    LInt nova, ant;
 
-    while (l != NULL) {
-        if (nova == NULL) {
+    for (nova = NULL; l != NULL; ant = nova, l=l->prox)
+        if (nova == NULL)
             nova = newLInt (l->valor, NULL);
-        } else {
+        else
             nova = newLInt (l-> valor, ant);
-        }
-        ant = nova;
-        l = l->prox;
-    }
+
     return nova;
 }
+
 
 // QUESTAO 18
 int maximo (LInt l){
     int max = l->valor;
 
-    while(l!=NULL) {
+    for (; l!=NULL; l = l->prox)
         if (l->valor > max)
             max = l->valor;
-        l = l->prox;
-    }
+
     return max;
 }
 
 // QUESTAO 19
 int take (int n, LInt *l){
     int length = 0, contador = 0, res;
-    LInt aux = *l, ant;
+    LInt aux, ant;
 
-    while (aux != NULL) {
-        length++;
-        aux=aux->prox;
-    }
+    for (aux = *l; aux != NULL; length++, aux = aux->prox);
 
     aux = *l;
 
     if (length > n) {
         res = n;
-        while (n>0) {
-            ant = aux;
-            aux = aux->prox;
-            n--;
-        }
+        for (; n>0; ant = aux, aux = aux->prox, n--);
 
         while (aux != NULL) {
             ant ->prox = NULL;
@@ -462,20 +403,17 @@ void remreps (LInt l){
 
 // QUESTAO 26
 LInt rotateL (LInt l){
-    LInt aux = l, ant;
+    LInt aux, ant;
 
     if (l!=NULL && l->prox!=NULL) {
         ant = l;
         l=l->prox;
-        aux = l;
 
-        while(aux->prox!=NULL)
-            aux = aux->prox;
+        for(aux = l;aux->prox!=NULL; aux = aux->prox);
 
         aux->prox = ant;
         ant->prox = NULL;
     }
-
     return l;
 }
 
@@ -484,22 +422,18 @@ LInt parte (LInt l){
     LInt nova = NULL, ant = l, aux = l, auxnova = NULL;
     int conta = 1;
 
-    while (aux != NULL) {
+    for (aux =l; aux != NULL; conta++)
         if (conta % 2 == 1) {
             ant = aux;
             aux = aux->prox;
             ant->prox = NULL;
         } else {
-            ant ->prox = aux->prox;
-            if(auxnova == NULL) {
+            ant->prox = aux->prox;
+            if (auxnova == NULL)
                 auxnova = nova = newLInt(aux->valor, NULL);
-            } else {
-                auxnova = auxnova->prox = newLInt (aux -> valor, NULL);
-            }
+            else
+                auxnova = auxnova->prox = newLInt(aux->valor, NULL);
             aux = aux->prox;
         }
-        conta++;
-    }
     return nova;
 }
-
