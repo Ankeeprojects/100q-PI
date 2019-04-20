@@ -35,7 +35,6 @@ void freeL (LInt l) {
 
 // QUESTAO 3
 void imprimeL (LInt l) {
-
     while (l != NULL) {
         printf("O valor desta célula é: %d\n", l->valor)
         l = l->prox;
@@ -44,54 +43,54 @@ void imprimeL (LInt l) {
 
 // QUESTAO 4
 LInt reverseL (LInt l){
-    LInt ant = NULL, aux = NULL;
-    while (l != NULL) {
-        aux = l;
-        l = l->prox;
-        aux -> prox = ant;
-        ant = aux;
+    LInt ant = NULL, aux = l;
+    while (aux != NULL) {
+        l = aux;
+        aux = aux->prox;
+        l -> prox = ant;
+        ant = l;
     }
-    return aux;
+
+    return l;
 }
 
 // QUESTAO 5
 void insertOrd (LInt *l, int x){
-    LInt ant = NULL, novo, l1 = *l;
-    novo = newLInt(x,NULL);
+    LInt ant = NULL, novo = newLInt(x,NULL), l1 = *l;
 
-    if (l1 == NULL)
+    while (l1 != NULL && l1->valor <= x) {
+        ant = l1;
+        l1 = l1->prox;
+    }
+
+    if (ant == NULL) {
+        novo -> prox = *l;
         *l = novo;
-    else {
-        while (l1 != NULL && l1->valor < x) {
-            ant = l1;
-            l1 = l1->prox;
-        }
-
-        if (ant == NULL)
-            *l = novo;
-        else
-            ant -> prox = novo;
+    } else {
+        ant -> prox = novo;
+        novo -> prox = l1;
     }
 }
 
 // QUESTAO 6
 int removeOneOrd (LInt *l, int x){
-    LInt l1 = *l, ant = NULL;
-    int res = 0;
+    LInt aux = *l, ant = NULL;
+    int sucesso = 0;
 
-    while (l1 != NULL && l1->valor != x) {
-        ant = l1;
-        l1 = l1->prox;
+    while (aux != NULL && aux -> valor != x) {
+        ant = aux;
+        aux = aux->prox;
     }
 
-    if (l1 == NULL)
-        res = 1;
-    else if (ant == NULL)
-        *l = (*l)-> prox;
-    else
-        ant -> prox = l1->prox;
+    if (aux != NULL) {
+        if (ant == NULL)
+            *l = (*l)->prox;
+        else {
+            ant -> prox = aux->prox;
+        }
+    } else sucesso = 1;
 
-    return res;
+    return sucesso;
 }
 
 // QUESTAO 7
@@ -137,24 +136,22 @@ void splitQS (LInt l, int x, LInt *mx, LInt *Mx){
         if (l -> valor < x) {
             if (menores == NULL) {
                 *mx = l;
-                l = l->prox;
                 menores = *mx;
             } else {
                 menores -> prox = l;
                 menores = menores->prox;
-                l = l->prox;
             }
+            l = l->prox;
             menores -> prox = NULL;
         } else {
             if (maiores == NULL) {
                 *Mx = l;
-                l = l->prox;
                 maiores = *Mx;
             } else {
                 maiores -> prox = l;
                 maiores = maiores->prox;
-                l = l -> prox;
             }
+            l = l -> prox;
             maiores -> prox = NULL;
         }
     }
