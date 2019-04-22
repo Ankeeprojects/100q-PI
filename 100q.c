@@ -300,42 +300,35 @@ int maximo (LInt l){
 
 // QUESTAO 19
 int take (int n, LInt *l){
-    int length = 0, contador = 0, res;
-    LInt aux, ant;
+    LInt aux, lib = NULL;
+    int c = n;
 
-    for (aux = *l; aux != NULL; length++, aux = aux->prox);
+    for( aux = *l ; aux != NULL && c > 0 ; c--, aux = aux->prox)
+        lib = aux;
 
-    aux = *l;
+    if(aux)
+        lib->prox = NULL;
 
-    if (length > n) {
-        res = n;
-        for (; n>0; ant = aux, aux = aux->prox, n--);
-
-        while (aux != NULL) {
-            ant ->prox = NULL;
-            ant = aux;
-            aux = aux->prox;
-            free(ant);
-        }
-    } else res = length;
-
-    return res;
+    while (aux){
+        lib = aux;
+        aux = aux->prox;
+        free(lib);
+    }
+    return n-c;
 }
 
 // QUESTAO 20
-int drop (int n, LInt *l){
-    LInt aux, ant;
-    int conta = 0, res;
+int drop (int n, LInt * l) {
+    LInt liberta;
+    int c = 0;
 
-    for (aux = *l; aux != NULL; aux = aux->prox) conta++;
+    for (; *l != NULL && c < n; c++) {
+        liberta = *l;
+        *l=(*l)->prox;
+        free (liberta);
+    }
 
-    if (n > conta)
-        res = conta;
-    else res = n;
-
-    for (;n > 0 && *l != NULL; n--,ant = *l, *l=(*l)->prox, free(ant)) ;
-
-    return res;
+    return c;
 }
 
 // QUESTAO 21
@@ -436,4 +429,46 @@ LInt parte (LInt l){
             aux = aux->prox;
         }
     return nova;
+}
+
+// QUESTAO 28
+int altura (ABin a){
+    if (a == NULL)
+        return 0;
+    else
+    if (altura (a->esq) > altura (a->dir))
+        return 1 + altura(a->esq);
+    else
+        return 1 + altura (a->dir);
+}
+
+// QUESTAO 30
+void mirror (ABin * a) {
+    if (*a) {
+        ABin salva = (*a)->esq;
+        (*a)->esq = (*a)->dir;
+        (*a)->dir = salva;
+
+        mirror (&(*a)->dir);
+        mirror (&(*a)->esq);
+    }
+}
+
+// QUESTAO 37
+int iguaisAB (ABin a, ABin b) {
+    if (a && b) {
+        return (a->valor == b->valor) && iguaisAB(a->esq, b->esq) && iguaisAB(a->dir, b->dir);
+    } else if (!a && !b)
+        return 1;
+    else return 0;
+}
+
+// QUESTAO 42
+int contaFolhas (ABin a) {
+    if (a) {
+        if (!a->esq && !a->dir)
+            return 1;
+        else return contaFolhas (a->esq) + contaFolhas (a->dir);
+    }
+    return 0;
 }
