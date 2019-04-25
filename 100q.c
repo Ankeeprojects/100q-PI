@@ -433,13 +433,34 @@ LInt parte (LInt l){
 
 // QUESTAO 28
 int altura (ABin a){
-    if (a == NULL)
-        return 0;
-    else
-    if (altura (a->esq) > altura (a->dir))
-        return 1 + altura(a->esq);
-    else
-        return 1 + altura (a->dir);
+    int r, ae, ad;
+
+    if (a) {
+        ae = altura(a->esq);
+        ad = altura(a->dir);
+
+        if (ae > ad)
+            r = 1 + ae;
+        else
+            r = 1 + ad;
+    } else
+        r = 0;
+
+    return r;
+}
+
+// QUESTAO 29
+ABin cloneAB (ABin a) {
+    ABin r;
+
+    if (a) {
+        r = malloc(sizeof(struct nodo));
+        r -> valor = a->valor;
+        r->esq = cloneAB(a->esq);
+        r->dir = cloneAB(a->dir);
+    } else r = NULL;
+
+    return r;
 }
 
 // QUESTAO 30
@@ -454,21 +475,312 @@ void mirror (ABin * a) {
     }
 }
 
+// QUESTAO 31
+void inorder (ABin a, LInt * l) {
+    LInt aux;
+
+    if (a) {
+        inorder (a->dir, l);
+        aux = *l;
+        *l = malloc(sizeof(struct lligada));
+        (*l)->valor = a->valor;
+        (*l)->prox = aux;
+        inorder (a->esq, l);
+    }
+}
+
+// QUESTAO 32 - mandei mail ao prof, se a inorder funciona estas duas também têm que funcionar..
+void preorder (ABin a, LInt * l) {
+    LInt aux;
+
+    if (a) {
+        preorder(a->dir, l);
+        preorder(a->esq, l);
+        aux = *l;
+        *l = malloc(sizeof(struct lligada));
+        (*l)->valor = a->valor;
+        (*l)->prox = aux;
+    }
+}
+
+// QUESTAO 33 - mesma coisa
+void posorder (ABin a, LInt * l) {
+    LInt aux;
+
+    if (a) {
+        aux = *l;
+        *l = malloc(sizeof(struct lligada));
+        (*l)->valor = a->valor;
+        (*l)->prox = aux;
+        posorder (a->dir, l);
+        posorder (a->esq,l);
+    }
+}
+
+// QUESTAO 34 - provavelmente rever...
+int depth (ABin a, int x) {
+    int res = -1, depthEsq, depthDir;
+
+    if (a) {
+        if (a->valor == x) {
+            res = 1;
+        } else {
+            depthEsq = depth(a->esq, x);
+            depthDir = depth(a->dir, x);
+
+            if (depthEsq > 0 && depthDir > 0)
+                if (depthEsq < depthDir)
+                    res = 1 + depthEsq;
+                else res = 1 + depthDir;
+            else if (depthEsq > 0)
+                res = 1 + depthEsq;
+            else if (depthDir > 0)
+                res = 1 + depthDir;
+        }
+    }
+    return res;
+}
+// QUESTAO 35
+int freeAB (ABin a) {
+    int r = 0;
+
+    if (a) {
+        r += 1 + freeAB (a->esq) + freeAB(a->dir);
+        free (a);
+    }
+
+    return r;
+}
+
+// QUESTAO 36
+int pruneAB (ABin *a, int l) {
+    int r = 0;
+    ABin aux;
+
+    if (*a)
+        if (l <= 1) {
+            r =  1 + pruneAB (&(*a)->esq, l-1) + pruneAB(&(*a)->dir, l-1);
+            aux = (*a)->esq;
+            (*a)->esq = NULL;
+            free (aux);
+            aux = (*a)->dir;
+            (*a)->dir = NULL;
+            free (aux);
+        } else
+            r = pruneAB(&(*a)->esq, l-1) + pruneAB(&(*a)->dir, l-1);
+
+    return r;
+}
+
 // QUESTAO 37
 int iguaisAB (ABin a, ABin b) {
+    int c = 0;
+
     if (a && b) {
-        return (a->valor == b->valor) && iguaisAB(a->esq, b->esq) && iguaisAB(a->dir, b->dir);
+        if (a->valor == b->valor)
+            c = iguaisAB(a->esq, b->esq) && iguaisAB(a->dir, b->dir);
     } else if (!a && !b)
-        return 1;
-    else return 0;
+        c = 1;
+
+    return c;
+}
+
+// QUESTAO 38
+LInt nivelL (ABin a, int n) {
+    LInt l = NULL, aux;
+
+    if (a && n>0)
+        if (n > 1) {
+            l = nivelL(a->esq, n-1);
+            if (l) {
+                for(aux = l; aux->prox != NULL; aux = aux->prox);
+                aux->prox = nivelL(a->dir, n-1);
+            } else
+                l = nivelL(a->dir, n-1);
+        } else {
+            l = malloc(sizeof(struct lligada));
+            l->valor = a->valor;
+            l->prox = NULL;
+        }
+
+    return l;
+}
+
+// QUESTAO 39
+int nivelV (ABin a, int n, int v[]) {
+    int r = 0;
+
+    if (a)
+        if (n != 1) {
+            r+= nivelV(a->esq,n-1,v);
+            r+= nivelV(a->dir,n-1,v+r);
+        } else
+            v[r++] = a->valor;
+
+    return r;
+}
+
+// QUESTAO 40
+int dumpAbin (ABin a, int v[], int N) {
+    int r = 0, p;
+    if (a)
+        if(N > 0) {
+            r = dumpAbin (a->esq, v, N-1);
+            v[r++] = a->valor;
+            r+=dumpAbin (a->dir, v+r, N-r);
+        }
+    return r;
 }
 
 // QUESTAO 42
 int contaFolhas (ABin a) {
-    if (a) {
+    int r = 0;
+
+    if (a)
         if (!a->esq && !a->dir)
-            return 1;
-        else return contaFolhas (a->esq) + contaFolhas (a->dir);
-    }
-    return 0;
+            r = 1;
+        else r =  contaFolhas (a->esq) + contaFolhas (a->dir);
+
+    return r;
 }
+
+// QUESTAO 43
+ABin cloneMirror (ABin a) {
+    ABin nova;
+
+    if (a) {
+        nova = malloc(sizeof(struct nodo));
+        nova-> valor = a->valor;
+        nova->esq = cloneMirror (a->dir);
+        nova->dir = cloneMirror (a->esq);
+    }
+    else nova = NULL;
+
+    return nova;
+}
+
+// QUESTAO 44
+int addOrd (ABin *a, int x) {
+    int r = 0;
+
+    while (*a && !r)
+        if ((*a)->valor > x)
+            a = &(*a)->esq;
+        else if ((*a)->valor < x)
+            a = &(*a)->dir;
+        else r = 1;
+
+    if (!r) {
+        *a = malloc(sizeof(struct nodo));
+        (*a)->valor = x;
+        (*a)->esq = NULL;
+        (*a)->dir = NULL;
+    }
+    return r;
+}
+
+// QUESTAO 45
+int lookupAB (ABin a, int x) {
+    int res = 0;
+
+    while (a && x != a->valor)
+        if (a->valor > x)
+            a = a->esq;
+        else a = a->dir;
+
+    if (a && a->valor == x)
+        res = 1;
+
+    return res;
+}
+
+// QUESTAO 46
+int depthOrd (ABin a, int x) {
+    int i;
+
+    for (i = 1; a && a->valor != x;i++)
+        if (a->valor < x)
+            a = a->dir;
+        else
+            a = a->esq;
+
+    if (!a)
+        i = -1;
+
+    return i;
+}
+
+// QUESTAO 47
+int maiorAB (ABin a) {
+
+    while (a ->dir)
+        a = a->dir;
+
+    return a->valor;
+}
+
+// QUESTAO 48
+void removeMaiorA (ABin *a) {
+
+    if((*a)->dir)
+        removeMaiorA(&(*a)->dir);
+    else if ((*a)->esq)
+        *a = (*a)->esq;
+    else
+        *a = NULL;
+}
+
+// QUESTAO 49
+int quantosMaiores (ABin a, int x) {
+    int r = 0;
+
+    if (a)
+        if (a->valor > x)
+            r+= 1 + quantosMaiores(a->esq, x) + quantosMaiores(a->dir, x);
+        else r += quantosMaiores(a->dir,x);
+
+
+    return r;
+}
+
+// QUESTAO 50 - provavelmente rever, está uma caca
+int comprimento (LInt l) {
+    int r = 0;
+
+    while (l) {
+        r++;
+        l = l->prox;
+    }
+
+    return r;
+}
+
+LInt avanca (LInt l, int p) {
+    while (p > 0) {
+        l = l->prox;
+        p--;
+    }
+    return l;
+}
+
+void fromList(LInt l, ABin *a, int N) {
+    int r,p;
+    LInt aux;
+
+    if (N > 0) {
+        *a = malloc(sizeof(struct nodo));
+        p = N/2;
+        aux = avanca(l, p);
+        (*a)->valor = aux->valor;
+        fromList(l, &(*a)->esq, p);
+        fromList(aux->prox, &(*a)->dir, N - p - 1);
+    } else
+        *a = NULL;
+}
+
+void listToBTree (LInt l, ABin *a) {
+    int N = comprimento(l);
+
+    fromList(l, a, N);
+}
+
