@@ -632,6 +632,25 @@ int dumpAbin (ABin a, int v[], int N) {
     return r;
 }
 
+// QUESTAO 41
+ABin somasAcA (ABin a) {
+    ABin nova=NULL;
+
+    if(a){
+        nova=malloc(sizeof(struct nodo));
+        nova->esq = somasAcA(a->esq);
+        nova->dir = somasAcA(a->dir);
+        nova->valor = a->valor;
+
+        if(nova->esq)
+            nova->valor+=nova->esq->valor;
+        if(nova->dir)
+            nova->valor+=nova->dir->valor;
+    }
+
+    return nova;
+}
+
 // QUESTAO 42
 int contaFolhas (ABin a) {
     int r = 0;
