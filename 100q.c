@@ -36,7 +36,7 @@ void freeL (LInt l) {
 // QUESTAO 3
 void imprimeL (LInt l) {
     for (;l != NULL; l = l->prox)
-        printf("O valor desta célula é: %d\n", l->valor;
+        printf("O valor desta célula é: %d\n", l->valor);
 }
 
 // QUESTAO 4
