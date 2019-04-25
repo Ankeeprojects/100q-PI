@@ -784,3 +784,28 @@ void listToBTree (LInt l, ABin *a) {
     fromList(l, a, N);
 }
 
+// QUESTAO 51
+int seraDeProcura (ABin a, int avo, int ramo) {
+    int procura = 1;
+    if (a) {
+        if (a->esq)
+            if (ramo == 0)
+                procura = procura && a->esq->valor < avo && a->esq->valor < a->valor && seraDeProcura(a->esq, a->valor,0);
+            else
+                procura = procura && a->esq->valor > avo && a->esq->valor < a->valor && seraDeProcura(a->esq, a->valor,0);
+
+        if (a->dir)
+            if (ramo == 0)
+                procura = procura && a->dir->valor < avo && a->dir->valor > a->valor && seraDeProcura(a->dir, a->valor,1);
+            else
+                procura = procura && a->dir->valor > avo && a->dir->valor > a->valor && seraDeProcura(a->dir, a->valor,1);
+    }
+    return procura;
+}
+
+int deProcura (ABin a) {
+    int procura = 1;
+    if (a)
+        procura = seraDeProcura (a->esq, a->valor,0) && seraDeProcura (a->dir, a->valor,1);
+    return procura;
+}
