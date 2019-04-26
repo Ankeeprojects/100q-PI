@@ -54,35 +54,29 @@ LInt reverseL (LInt l){
 
 // QUESTAO 5
 void insertOrd (LInt *l, int x){
-    LInt ant = NULL, novo = newLInt(x,NULL), l1;
+    LInt ant = NULL, nova = newLInt (x, NULL);
 
-    for (l1 = *l; l1 != NULL && l1->valor <= x; l1 = l1->prox)
-        ant = l1;
+    for (;*l && (*l)->valor < x; ant = *l, l = &(*l)->prox);
 
-    if (ant == NULL) {
-        novo -> prox = *l;
-        *l = novo;
+    if (ant) {
+        nova->prox = ant->prox;
+        ant->prox = nova;
     } else {
-        ant -> prox = novo;
-        novo -> prox = l1;
+        nova->prox = *l;
+        *l = nova;
     }
 }
 
 // QUESTAO 6
 int removeOneOrd (LInt *l, int x){
-    LInt aux, ant = NULL;
-    int sucesso = 0;
+    int sucesso = 1;
 
-    for (aux = *l; aux != NULL && aux -> valor != x; aux = aux->prox)
-        ant = aux;
+    for (; *l && (*l)->valor != x; l = &(*l)->prox);
 
-    if (aux != NULL) {
-        if (ant == NULL)
-            *l = (*l)->prox;
-        else {
-            ant -> prox = aux->prox;
-        }
-    } else sucesso = 1;
+    if (*l) {
+        sucesso = 0;
+        *l = (*l)->prox;
+    }
 
     return sucesso;
 }
@@ -108,86 +102,60 @@ void merge (LInt *r, LInt l1, LInt l2){
     else
         *r = l1;
 }
-
 // QUESTAO 8
 void splitQS (LInt l, int x, LInt *mx, LInt *Mx){
-    LInt maiores = NULL, menores = NULL;
-
-    while (l != NULL) {
-        if (l -> valor < x) {
-            if (menores == NULL) {
-                *mx = l;
-                menores = *mx;
-            } else {
-                menores -> prox = l;
-                menores = menores->prox;
-            }
-            l = l->prox;
-            menores -> prox = NULL;
+    for (; l; l = l->prox)
+        if (l->valor < x) {
+            *mx = l;
+            mx = &(*mx)->prox;
         } else {
-            if (maiores == NULL) {
-                *Mx = l;
-                maiores = *Mx;
-            } else {
-                maiores -> prox = l;
-                maiores = maiores->prox;
-            }
-            l = l -> prox;
-            maiores -> prox = NULL;
+            *Mx = l;
+            Mx = &(*Mx)->prox;
         }
-    }
+    *mx = *Mx = NULL;
 }
 
 // QUESTAO 9
 LInt parteAmeio (LInt *l){
-    LInt aux, nova = NULL, res = NULL;
-    int length = 0;
+    LInt nova = NULL, aux;
+    int conta = 0;
 
-    for (aux = *l; aux != NULL; length++, aux = aux->prox);
+    for (aux = *l; aux; aux = aux->prox, conta++);
 
-    for (length = length/2; length > 0; nova->prox = NULL, length--)
-        if (nova == NULL) {
-            nova = *l;
-            *l = (*l)->prox;
-            res = nova;
-        } else {
-            nova -> prox = *l;
-            *l = (*l)->prox;
-            nova = nova->prox;
-        }
+    for (conta/=2; *l, conta; conta--, *l = (*l)->prox, aux->prox = NULL)
+        if (!nova)
+            aux = nova = *l;
+        else
+            aux = aux->prox = *l;
 
-    return res;
+    return nova;
 }
 
 // QUESTAO 10
 int removeAll (LInt *l, int x){
     int conta = 0;
-    LInt aux, ant = NULL;
 
-    for(aux = *l; aux != NULL; aux = aux->prox)
-        if (aux -> valor == x) {
-            if (ant == NULL)
-                *l = aux->prox;
-            else
-                ant -> prox = aux->prox;
+    while(*l)
+        if ((*l)->valor == x) {
             conta++;
-        } else ant = aux;
+            *l = (*l)->prox;
+        } else
+            l = &(*l)->prox;
 
     return conta;
 }
 
 // QUESTAO 11
 int removeDups (LInt *l){
-    LInt inicio, aux, ant;
+    LInt inicio = *l, ant;
     int conta = 0;
-
-    for (inicio = *l; inicio != NULL; inicio = inicio->prox)
-        for (aux = inicio->prox, ant = inicio; aux != NULL; aux = aux->prox)
-            if (inicio->valor == aux->valor) {
-                ant -> prox = aux->prox;
+    for (; *l; l = &(*l)->prox)
+        for (ant = *l, inicio = (*l)->prox; inicio; inicio=inicio->prox)
+            if (inicio->valor == (*l)->valor) {
+                ant->prox = inicio->prox;
                 conta++;
-            } else ant = aux;
-
+            } else
+                ant = inicio;
     return conta;
 }
 
@@ -211,42 +179,26 @@ int removeMaiorL (LInt *l){
 
 // QUESTAO 13
 void init (LInt *l){
-    LInt aux, ant;
+    LInt aux;
+    for(; (*l)->prox; l = &(*l)->prox);
 
-    for (aux = *l, ant = NULL; aux -> prox != NULL; ant = aux, aux = aux->prox);
-
-    if (ant != NULL) {
-        ant -> prox = aux -> prox;
-        free(aux);
-    } else {
-        *l = NULL;
-        free(*l);
-    }
+    aux = *l;
+    *l = NULL;
+    free (aux);
 }
 
 // QUESTAO 14
-void appendL (LInt *l, int x) {
-    LInt aux, ant, novo = newLInt(x, NULL);
+void appendL (LInt *l, int x){
+    while (*l) l = &(*l)->prox;
 
-    for (aux = *l, ant = NULL; aux != NULL; ant = aux, aux = aux->prox);
-
-    if (ant == NULL)
-        *l = novo;
-    else
-        ant->prox = novo;
+    *l = newLInt(x, NULL);
 }
 
 // QUESTAO 15
 void concatL (LInt *a, LInt b){
-    LInt aux = *a;
+    while(*a) a = &(*a)->prox;
 
-    if (*a == NULL)
-        *a = b;
-    else {
-        for (; aux -> prox != NULL; aux = aux->prox);
-
-        aux -> prox = b;
-    }
+    *a = b;
 }
 
 // QUESTAO 16
@@ -289,21 +241,14 @@ int maximo (LInt l){
 
 // QUESTAO 19
 int take (int n, LInt *l){
-    LInt aux, lib = NULL;
-    int c = n;
+    int conta;
+    LInt aux;
 
-    for( aux = *l ; aux != NULL && c > 0 ; c--, aux = aux->prox)
-        lib = aux;
+    for (conta = 0; *l && conta < n; conta++, l = &(*l)->prox);
 
-    if(aux)
-        lib->prox = NULL;
+    for (; *l; aux = *l, *l = NULL, free(aux));
 
-    while (aux){
-        lib = aux;
-        aux = aux->prox;
-        free(lib);
-    }
-    return n-c;
+    return conta;
 }
 
 // QUESTAO 20
