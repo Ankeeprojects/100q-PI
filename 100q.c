@@ -89,35 +89,24 @@ int removeOneOrd (LInt *l, int x){
 
 // QUESTAO 7
 void merge (LInt *r, LInt l1, LInt l2){
-    LInt re;
-
-    if (l1 == NULL)
+    if (!l2)
+        *r = l1;
+    else if (!l1)
         *r = l2;
-    else if (l2 == NULL)
-        *r == l1;
-    else {
-        if (l1 -> valor > l2 -> valor) {
-            re = *r = l2;
+
+    for (;l1 && l2; *r = &(*r)->prox)
+        if (l1->valor > l2->valor) {
+            *r = l2;
             l2 = l2->prox;
         } else {
-            re = *r = l1;
+            *r = l1;
             l1 = l1->prox;
         }
 
-        for(;l1 != NULL && l2 != NULL; re = re->prox)
-            if (l1 -> valor > l2->valor) {
-                re -> prox = l2;
-                l2 = l2->prox;
-            } else {
-                re -> prox = l1;
-                l1 = l1->prox;
-            }
-
-        if (l1 == NULL)
-            re->prox = l2;
-        else
-            re->prox = l1;
-    }
+    if (!l1)
+        *r = l2;
+    else
+        *r = l1;
 }
 
 // QUESTAO 8
@@ -477,43 +466,46 @@ void mirror (ABin * a) {
 
 // QUESTAO 31
 void inorder (ABin a, LInt * l) {
-    LInt aux;
+    *l = NULL;
 
     if (a) {
-        inorder (a->dir, l);
-        aux = *l;
-        *l = malloc(sizeof(struct lligada));
+        inorder(a->esq, l);
+        while (*l) l = &(*l)->prox;
+
+        *l = malloc(sizeof(struct nodo));
         (*l)->valor = a->valor;
-        (*l)->prox = aux;
-        inorder (a->esq, l);
+        (*l)->prox = NULL;
+
+        inorder (a->dir, &(*l)->prox);
     }
 }
 
-// QUESTAO 32 - mandei mail ao prof, se a inorder funciona estas duas também têm que funcionar..
+// QUESTAO 32
 void preorder (ABin a, LInt * l) {
-    LInt aux;
+    *l = NULL;
 
     if (a) {
-        preorder(a->dir, l);
-        preorder(a->esq, l);
-        aux = *l;
-        *l = malloc(sizeof(struct lligada));
+        *l = malloc(sizeof(struct nodo));
         (*l)->valor = a->valor;
-        (*l)->prox = aux;
+        (*l)->prox = NULL;
+
+        preorder(a->esq, &(*l)->prox);
+        while (*l) l = &(*l)->prox;
+        preorder (a->dir, l);
     }
 }
 
-// QUESTAO 33 - mesma coisa
+// QUESTAO 33
 void posorder (ABin a, LInt * l) {
-    LInt aux;
-
+    *l = NULL;
     if (a) {
-        aux = *l;
-        *l = malloc(sizeof(struct lligada));
-        (*l)->valor = a->valor;
-        (*l)->prox = aux;
+        posorder(a->esq, l);
+        while (*l) l = &(*l)->prox;
         posorder (a->dir, l);
-        posorder (a->esq,l);
+        while (*l) l = &(*l)->prox;
+        *l = malloc(sizeof(struct nodo));
+        (*l)->valor = a->valor;
+        (*l)->prox = NULL;
     }
 }
 
