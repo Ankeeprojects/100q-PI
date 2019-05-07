@@ -157,21 +157,18 @@ int removeDups (LInt *l){
 
 // QUESTAO 12
 int removeMaiorL (LInt *l){
-    LInt aux, ant = NULL;
-    int maior = aux-> valor;
+    LInt aux, ant;
+    int maior = (*l)->valor;
 
-    for (aux = *l; aux != NULL; aux = aux->prox)
-        if (aux -> valor > maior)
-            maior = aux->valor;
+    for (aux = *l; aux ;ant = aux,  aux = aux->prox)
+        if (aux->valor > (*l)->valor)
+            l = &(ant->prox);
 
-    for (aux = *l; aux -> valor != maior; ant = aux, aux = aux->prox);
-
-    if (ant == NULL)
-        *l = (*l)->prox;
-    else ant -> prox = aux -> prox;
+    maior = (*l)->valor;
+    *l = (*l)->prox;
 
     return maior;
-}
+}}
 
 // QUESTAO 13
 void init (LInt *l){
@@ -309,19 +306,19 @@ LInt somasAcL (LInt l) {
 
 // QUESTAO 25
 void remreps (LInt l){
-    LInt inicio, aux, ant, liberta;
+    LInt * aux = &l;
+    LInt lib;
 
-    for (inicio = l; inicio != NULL; inicio = inicio->prox)
-        for (aux = inicio->prox, ant = inicio ; aux != NULL;)
-            if (inicio -> valor == aux->valor) {
-                ant ->prox = aux->prox;
-                liberta = aux;
-                aux = aux->prox;
-                free(liberta);
-            } else {
-                ant = aux;
-                aux = aux->prox;
+    for (; l && l->prox; l = l->prox) {
+        aux = &l->prox;
+        while (*aux)
+            if ((*aux)->valor == l->valor) {
+                lib = *aux;
+                *aux = (*aux)->prox;
+                free(lib);
             }
+            else aux = &(*aux)->prox;
+    }
 }
 
 // QUESTAO 26
@@ -342,21 +339,21 @@ LInt rotateL (LInt l){
 
 // QUESTAO 27
 LInt parte (LInt l){
-    LInt nova = NULL, ant = l, aux = l, auxnova = NULL;
+    LInt nova = NULL, ant = l, auxnova = NULL;
     int conta = 1;
 
-    for (aux =l; aux != NULL; conta++)
+    for (; l != NULL; conta++)
         if (conta % 2 == 1) {
-            ant = aux;
-            aux = aux->prox;
+            ant = l;
+            l = l->prox;
             ant->prox = NULL;
         } else {
-            ant->prox = aux->prox;
+            ant->prox = l->prox;
             if (auxnova == NULL)
-                auxnova = nova = newLInt(aux->valor, NULL);
+                auxnova = nova = newLInt(l->valor, NULL);
             else
-                auxnova = auxnova->prox = newLInt(aux->valor, NULL);
-            aux = aux->prox;
+                auxnova = auxnova->prox = newLInt(l->valor, NULL);
+            l = l->prox;
         }
     return nova;
 }
@@ -450,7 +447,7 @@ void posorder (ABin a, LInt * l) {
     }
 }
 
-// QUESTAO 34 - provavelmente rever...
+// QUESTAO 34
 int depth (ABin a, int x) {
     int res = -1, depthEsq, depthDir;
 
@@ -488,34 +485,25 @@ int freeAB (ABin a) {
 // QUESTAO 36
 int pruneAB (ABin *a, int l) {
     int r = 0;
-    ABin aux;
-
-    if (*a)
-        if (l <= 1) {
-            r =  1 + pruneAB (&(*a)->esq, l-1) + pruneAB(&(*a)->dir, l-1);
-            aux = (*a)->esq;
-            (*a)->esq = NULL;
-            free (aux);
-            aux = (*a)->dir;
-            (*a)->dir = NULL;
-            free (aux);
-        } else
-            r = pruneAB(&(*a)->esq, l-1) + pruneAB(&(*a)->dir, l-1);
-
+    if (*a) {
+        r += pruneAB(&(*a)->esq, l-1) + pruneAB(&(*a)->dir, l-1);
+        if (l <= 0) {
+            r++;
+            *a = NULL;
+            free(*a);
+        }
+    }
     return r;
 }
 
 // QUESTAO 37
 int iguaisAB (ABin a, ABin b) {
-    int c = 0;
+    int res = 1;
 
-    if (a && b) {
-        if (a->valor == b->valor)
-            c = iguaisAB(a->esq, b->esq) && iguaisAB(a->dir, b->dir);
-    } else if (!a && !b)
-        c = 1;
-
-    return c;
+    if (a && b)
+        res = a->valor == b->valor && iguaisAB(a->esq, b->esq) && iguaisAB(a->dir, b->dir);
+    else res = !a && !b;
+    return res;
 }
 
 // QUESTAO 38
@@ -598,7 +586,7 @@ int contaFolhas (ABin a) {
 
 // QUESTAO 43
 ABin cloneMirror (ABin a) {
-    ABin nova;
+    ABin nova = NULL;
 
     if (a) {
         nova = malloc(sizeof(struct nodo));
@@ -606,7 +594,6 @@ ABin cloneMirror (ABin a) {
         nova->esq = cloneMirror (a->dir);
         nova->dir = cloneMirror (a->esq);
     }
-    else nova = NULL;
 
     return nova;
 }
@@ -664,22 +651,16 @@ int depthOrd (ABin a, int x) {
 
 // QUESTAO 47
 int maiorAB (ABin a) {
-
-    while (a ->dir)
-        a = a->dir;
-
+    for(; a ->dir; a = a->dir);
     return a->valor;
 }
 
 // QUESTAO 48
 void removeMaiorA (ABin *a) {
-
-    if((*a)->dir)
-        removeMaiorA(&(*a)->dir);
-    else if ((*a)->esq)
+    while (*a && (*a)->dir) a = &(*a)->dir;
+    if ((*a)->esq)
         *a = (*a)->esq;
-    else
-        *a = NULL;
+    else *a = NULL;
 }
 
 // QUESTAO 49
@@ -690,7 +671,6 @@ int quantosMaiores (ABin a, int x) {
         if (a->valor > x)
             r+= 1 + quantosMaiores(a->esq, x) + quantosMaiores(a->dir, x);
         else r += quantosMaiores(a->dir,x);
-
 
     return r;
 }
