@@ -210,13 +210,10 @@ LInt cloneL (LInt l) {
 
 // QUESTAO 17
 LInt cloneRev (LInt l){
-    LInt nova, ant;
+    LInt nova = NULL;
 
-    for (nova = NULL; l != NULL; ant = nova, l=l->prox)
-        if (nova == NULL)
-            nova = newLInt (l->valor, NULL);
-        else
-            nova = newLInt (l-> valor, ant);
+    for (; l; l = l->prox)
+        nova = newLInt(l->valor, nova);
 
     return nova;
 }
@@ -290,18 +287,26 @@ LInt arrayToList (int v[], int N){
     return nova;
 }
 
+// alternativa, javardice
+LInt arrayToList (int v[], int N){
+    LInt nova = NULL;
+
+    for (N -= 1; N >= 0; N--)
+        nova = newLInt(v[N], nova);
+
+    return nova;
+}
+
 // QUESTAO 24
 LInt somasAcL (LInt l) {
-    LInt nova = NULL, inicio, aux, auxnova = NULL;
+    LInt nova = NULL, ant;
 
-    for (inicio = l; inicio != NULL; inicio = inicio->prox) {
-        if (auxnova == NULL)
-            auxnova = nova = newLInt(0, NULL);
-        else auxnova = auxnova->prox = newLInt(0, NULL);
+    for (; l; l = l->prox)
+        if (!nova)
+            ant = nova = newLInt (l->valor, NULL);
+        else
+            ant = ant->prox = newLInt(l->valor+ant->valor, NULL);
 
-        for (aux = l; aux != inicio->prox; aux = aux->prox)
-            auxnova->valor += aux ->valor;
-    }
     return nova;
 }
 
@@ -340,20 +345,19 @@ LInt rotateL (LInt l){
 
 // QUESTAO 27
 LInt parte (LInt l){
-    LInt nova = NULL, ant = l, auxnova;
+    LInt * aux, nova = NULL, auxnova;
 
-    if (l && l->prox) {
-        nova = auxnova = l->prox;
-        l->prox = nova->prox;
-        ant = l;
-        l = l->prox;
+    if (l) {
+        for (aux = &(l->prox); *aux;) {
+            if (!nova)
+                nova = auxnova = *aux;
+            else auxnova = auxnova->prox = *aux;
+            *aux = (*aux)->prox;
 
-        for (; l; l=l->prox) {
-            ant ->prox = l;
-            ant = l;
-            auxnova = auxnova->prox = l->prox;
-            if (auxnova)
-                l->prox = auxnova->prox;
+            if (*aux) {
+                aux = &(*aux)->prox;
+                auxnova->prox = NULL;
+            }
         }
     }
     return nova;
