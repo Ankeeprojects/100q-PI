@@ -17,7 +17,7 @@ typedef struct lligada {
 // QUESTAO 1
 int length (LInt l){
     int i;
-    for (i = 0; l != NULL; i++, l= l->prox);
+    for (i = 0; l; i++, l= l->prox);
 
     return i;
 }
@@ -26,7 +26,7 @@ int length (LInt l){
 void freeL (LInt l) {
     LInt ant;
 
-    while (l != NULL) {
+    while (l) {
         ant = l;
         l = l->prox;
         free(ant);
@@ -35,7 +35,7 @@ void freeL (LInt l) {
 
 // QUESTAO 3
 void imprimeL (LInt l) {
-    for (;l != NULL; l = l->prox)
+    for (; l; l = l->prox)
         printf("O valor desta célula é: %d\n", l->valor);
 }
 
@@ -83,7 +83,6 @@ int removeOneOrd (LInt *l, int x){
 
 // QUESTAO 7
 void merge (LInt *r, LInt l1, LInt l2){
-
     for (;l1 && l2; *r = &(*r)->prox)
         if (l1->valor > l2->valor) {
             *r = l2;
@@ -98,6 +97,7 @@ void merge (LInt *r, LInt l1, LInt l2){
     else
         *r = l2;
 }
+
 // QUESTAO 8
 void splitQS (LInt l, int x, LInt *mx, LInt *Mx){
     for (; l; l = l->prox)
@@ -143,15 +143,16 @@ int removeAll (LInt *l, int x){
 
 // QUESTAO 11
 int removeDups (LInt *l){
-    LInt inicio = *l, ant;
     int conta = 0;
-    for (; *l; l = &(*l)->prox)
-        for (ant = *l, inicio = (*l)->prox; inicio; inicio=inicio->prox)
-            if (inicio->valor == (*l)->valor) {
-                ant->prox = inicio->prox;
+    LInt * aux;
+
+    for (; *l && (*l)->prox; l = &(*l)->prox)
+        for(aux = &(*l)->prox; *aux;)
+            if ((*aux)->valor == (*l)->valor) {
+                *aux = (*aux)->prox;
                 conta++;
-            } else
-                ant = inicio;
+            } else aux = &(*aux)->prox;
+
     return conta;
 }
 
@@ -168,7 +169,7 @@ int removeMaiorL (LInt *l){
     *l = (*l)->prox;
 
     return maior;
-}}
+}
 
 // QUESTAO 13
 void init (LInt *l){
@@ -339,22 +340,22 @@ LInt rotateL (LInt l){
 
 // QUESTAO 27
 LInt parte (LInt l){
-    LInt nova = NULL, ant = l, auxnova = NULL;
-    int conta = 1;
+    LInt nova = NULL, ant = l, auxnova;
 
-    for (; l != NULL; conta++)
-        if (conta % 2 == 1) {
+    if (l && l->prox) {
+        nova = auxnova = l->prox;
+        l->prox = nova->prox;
+        ant = l;
+        l = l->prox;
+
+        for (; l; l=l->prox) {
+            ant ->prox = l;
             ant = l;
-            l = l->prox;
-            ant->prox = NULL;
-        } else {
-            ant->prox = l->prox;
-            if (auxnova == NULL)
-                auxnova = nova = newLInt(l->valor, NULL);
-            else
-                auxnova = auxnova->prox = newLInt(l->valor, NULL);
-            l = l->prox;
+            auxnova = auxnova->prox = l->prox;
+            if (auxnova)
+                l->prox = auxnova->prox;
         }
+    }
     return nova;
 }
 
