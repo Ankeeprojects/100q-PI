@@ -303,7 +303,7 @@ LInt somasAcL (LInt l) {
 
     for (; l; l = l->prox)
         if (!nova)
-            ant = nova = newLInt (l->valor, NULL);
+            ant = nova = newLInt(l->valor, NULL);
         else
             ant = ant->prox = newLInt(l->valor+ant->valor, NULL);
 
@@ -312,7 +312,7 @@ LInt somasAcL (LInt l) {
 
 // QUESTAO 25
 void remreps (LInt l){
-    LInt * aux = &l;
+    LInt * aux;
     LInt lib;
 
     for (; l && l->prox; l = l->prox) {
