@@ -513,23 +513,20 @@ int iguaisAB (ABin a, ABin b) {
 
 // QUESTAO 38
 LInt nivelL (ABin a, int n) {
-    LInt l = NULL, aux;
-
-    if (a && n>0)
-        if (n > 1) {
-            l = nivelL(a->esq, n-1);
-            if (l) {
-                for(aux = l; aux->prox != NULL; aux = aux->prox);
-                aux->prox = nivelL(a->dir, n-1);
-            } else
-                l = nivelL(a->dir, n-1);
+    LInt nova = NULL, aux;
+    if (a)
+        if (n == 1) {
+            nova = malloc(sizeof(struct lligada));
+            nova ->valor = a->valor;
+            nova->prox = NULL;
         } else {
-            l = malloc(sizeof(struct lligada));
-            l->valor = a->valor;
-            l->prox = NULL;
+            aux = nova = nivelL(a->esq, n-1);
+            while (aux && aux->prox) aux = aux->prox;
+            if (aux) aux->prox = nivelL(a->dir, n-1);
+            else nova = nivelL(a->dir, n-1);
         }
 
-    return l;
+    return nova;
 }
 
 // QUESTAO 39
@@ -548,7 +545,7 @@ int nivelV (ABin a, int n, int v[]) {
 
 // QUESTAO 40
 int dumpAbin (ABin a, int v[], int N) {
-    int r = 0, p;
+    int r = 0;
     if (a)
         if(N > 0) {
             r = dumpAbin (a->esq, v, N-1);
