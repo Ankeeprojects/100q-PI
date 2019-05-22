@@ -70,12 +70,15 @@ void insertOrd (LInt *l, int x){
 // QUESTAO 6
 int removeOneOrd (LInt *l, int x){
     int sucesso = 1;
+    LInt freeAux;
 
     for (; *l && (*l)->valor != x; l = &(*l)->prox);
 
     if (*l) {
         sucesso = 0;
+        freeAux = *l;
         *l = (*l)->prox;
+        free(freeAux);
     }
 
     return sucesso;
@@ -130,11 +133,14 @@ LInt parteAmeio (LInt *l){
 // QUESTAO 10
 int removeAll (LInt *l, int x){
     int conta = 0;
+    LInt freeAux;
 
     while(*l)
         if ((*l)->valor == x) {
             conta++;
+            freeAux  = *l;
             *l = (*l)->prox;
+            free(freeAux);
         } else
             l = &(*l)->prox;
 
@@ -144,12 +150,14 @@ int removeAll (LInt *l, int x){
 // QUESTAO 11
 int removeDups (LInt *l){
     int conta = 0;
-    LInt * aux;
+    LInt * aux, freeAux;
 
     for (; *l && (*l)->prox; l = &(*l)->prox)
         for(aux = &(*l)->prox; *aux;)
             if ((*aux)->valor == (*l)->valor) {
+                freeAux = *aux;
                 *aux = (*aux)->prox;
+                free(freeAux);
                 conta++;
             } else aux = &(*aux)->prox;
 
@@ -166,7 +174,9 @@ int removeMaiorL (LInt *l){
             l = &(ant->prox);
 
     maior = (*l)->valor;
+    aux = *l;
     *l = (*l)->prox;
+    free(aux);
 
     return maior;
 }
@@ -415,7 +425,7 @@ void inorder (ABin a, LInt * l) {
         inorder(a->esq, l);
         while (*l) l = &(*l)->prox;
 
-        *l = malloc(sizeof(struct nodo));
+        *l = malloc(sizeof(struct lligada));
         (*l)->valor = a->valor;
         (*l)->prox = NULL;
 
@@ -428,7 +438,7 @@ void preorder (ABin a, LInt * l) {
     *l = NULL;
 
     if (a) {
-        *l = malloc(sizeof(struct nodo));
+        *l = malloc(sizeof(struct lligada));
         (*l)->valor = a->valor;
         (*l)->prox = NULL;
 
@@ -446,7 +456,7 @@ void posorder (ABin a, LInt * l) {
         while (*l) l = &(*l)->prox;
         posorder (a->dir, l);
         while (*l) l = &(*l)->prox;
-        *l = malloc(sizeof(struct nodo));
+        *l = malloc(sizeof(struct lligada));
         (*l)->valor = a->valor;
         (*l)->prox = NULL;
     }
@@ -475,6 +485,7 @@ int depth (ABin a, int x) {
     }
     return res;
 }
+
 // QUESTAO 35
 int freeAB (ABin a) {
     int r = 0;
@@ -659,10 +670,17 @@ int maiorAB (ABin a) {
 
 // QUESTAO 48
 void removeMaiorA (ABin *a) {
+    ABin freeAux;
+
     while (*a && (*a)->dir) a = &(*a)->dir;
+
+    freeAux = *a;
+
     if ((*a)->esq)
         *a = (*a)->esq;
     else *a = NULL;
+
+    free(freeAux);
 }
 
 // QUESTAO 49
