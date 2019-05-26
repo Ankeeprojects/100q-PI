@@ -195,6 +195,15 @@ void init (LInt *l){
 void appendL (LInt *l, int x){
     while (*l) l = &(*l)->prox;
 
+    *l = malloc(sizeof(struct lligada));
+    (*l)->valor = x;
+    (*l)->prox = NULL;
+}
+
+// Versão com newLInt
+void appendL (LInt *l, int x){
+    while (*l) l = &(*l)->prox;
+
     *l = newLInt(x, NULL);
 }
 
@@ -211,7 +220,22 @@ LInt cloneL (LInt l) {
 
     for (nova = NULL;l != NULL; l=l->prox)
         if (nova == NULL)
-            aux = nova = newLInt(l->valor, NULL);
+            aux = nova = malloc(sizeof(struct lligada));
+        else
+            aux = aux->prox = malloc(sizeof(struct lligada));
+    aux->valor = l->valor;
+    aux->prox = NULL;
+
+    return nova;
+}
+
+// Versão com newLInt
+LInt cloneL (LInt l) {
+    LInt nova, aux;
+
+    for (nova = NULL;l != NULL; l=l->prox)
+        if (nova == NULL)
+            aux = nova = malloc(sizeof(struct lligada));
         else
             aux = aux->prox = newLInt(l->valor, NULL);
 
@@ -219,6 +243,19 @@ LInt cloneL (LInt l) {
 }
 
 // QUESTAO 17
+LInt cloneRev (LInt l){
+    LInt nova, ant = NULL;
+
+    for (; l; l = l->prox) {
+        nova = malloc(sizeof(struct lligada));
+        nova->valor = l->valor;
+        nova->prox = ant;
+        ant = nova;
+    }
+    return nova;
+}
+
+// Versão com newLInt
 LInt cloneRev (LInt l){
     LInt nova = NULL;
 
@@ -288,6 +325,22 @@ LInt arrayToList (int v[], int N){
     LInt nova = NULL, aux = NULL;
     int i;
 
+    for (i = 0; i < N; i++) {
+        if (aux == NULL)
+            aux = nova = malloc(sizeof(struct lligada));
+        else
+            aux = aux->prox = malloc(sizeof(struct lligada));
+        aux->valor = v[i];
+        aux->prox = NULL;
+    }
+    return nova;
+}
+
+// Versão com newLInt
+LInt arrayToList (int v[], int N){
+    LInt nova = NULL, aux = NULL;
+    int i;
+
     for (i = 0; i < N; i++)
         if (aux == NULL)
             aux = nova = newLInt(v[i],NULL);
@@ -308,6 +361,25 @@ LInt arrayToList (int v[], int N){
 }
 
 // QUESTAO 24
+LInt somasAcL (LInt l) {
+    LInt nova = NULL, ant;
+
+    for (; l; l = l->prox) {
+        if (!nova) {
+            ant = nova = malloc(sizeof(struct lligada));
+            nova->valor = l->valor;
+        } else {
+            ant->prox = malloc(sizeof(struct lligada));
+            ant->prox->valor = l->valor + ant->valor;
+            ant = ant->prox;
+        }
+        ant->prox = NULL;
+    }
+
+    return nova;
+}
+
+// Versão com newLInt
 LInt somasAcL (LInt l) {
     LInt nova = NULL, ant;
 
