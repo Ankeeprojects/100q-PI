@@ -809,27 +809,27 @@ void listToBTree (LInt l, ABin *a) {
 }
 
 // QUESTAO 51
-int seraDeProcura (ABin a, int avo, int ramo) {
-    int procura = 1;
-    if (a) {
-        if (a->esq)
-            if (ramo == 0)
-                procura = procura && a->esq->valor < avo && a->esq->valor < a->valor && seraDeProcura(a->esq, a->valor,0);
-            else
-                procura = procura && a->esq->valor > avo && a->esq->valor < a->valor && seraDeProcura(a->esq, a->valor,0);
+int menor (ABin a, int x) {
+    int res = 1;
+    if (a) 
+        res = a->valor > x && menor (a->esq, x) && menor (a->dir, x);
+    
+    return res;
+}
 
-        if (a->dir)
-            if (ramo == 0)
-                procura = procura && a->dir->valor < avo && a->dir->valor > a->valor && seraDeProcura(a->dir, a->valor,1);
-            else
-                procura = procura && a->dir->valor > avo && a->dir->valor > a->valor && seraDeProcura(a->dir, a->valor,1);
-    }
-    return procura;
+int maior (ABin a, int x) {
+    int res = 1;
+    if (a) 
+        res = a->valor < x && maior (a->esq, x) && maior (a->dir, x);
+    
+    return res;
 }
 
 int deProcura (ABin a) {
-    int procura = 1;
-    if (a)
-        procura = seraDeProcura (a->esq, a->valor,0) && seraDeProcura (a->dir, a->valor,1);
-    return procura;
+    int res = 1;
+    
+    if (a) 
+        res = maior (a->esq, a->valor) && menor (a->dir, a->valor) && deProcura (a->esq) && deProcura (a->dir);
+        
+    return res;
 }
