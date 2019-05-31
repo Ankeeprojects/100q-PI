@@ -284,7 +284,7 @@ int take (int n, LInt *l){
 
     for (conta = 0; *l && conta < n; conta++, l = &(*l)->prox);
 
-    for (; *l; aux = *l, *l = NULL, free(aux));
+    for (; *l; aux = *l, free(aux), *l = (*l)->prox);
 
     return conta;
 }
